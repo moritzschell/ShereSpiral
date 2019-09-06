@@ -1,8 +1,10 @@
-import peasy.PeasyCam;
-PeasyCam cam;
+//import peasy.PeasyCam;
+//PeasyCam cam;
 
 float sphereRadius = 100;
 float rotationX = 0;
+
+boolean whiteBG = true;
 
 void setup() {
   size(400, 400, P3D);
@@ -11,29 +13,28 @@ void setup() {
 }
 
 void draw() {
-  background(255);
-  
+  if (whiteBG)
+    background(255);
+  else  background(0);
+
+  noFill();
+  if (whiteBG)
+    stroke(0); 
+  else stroke(255);
+
   translate(width/2, width/2, 0);  ///no need with peasyCam
-  
   rotateY(rotationX);
   
-  noStroke();
-  fill(0);
-  
-  for(float i = -sphereRadius; i < sphereRadius; i+=.1){
+  beginShape();
+  for (float i = -sphereRadius; i < sphereRadius; i+=.1) {
     float angle = map(i, 0, sphereRadius*2, 0, 10*TAU);
     PVector surfacePoint = pointOnSphere(i, sphereRadius, angle);
-    pushMatrix();
-    translate(surfacePoint.x, surfacePoint.y, surfacePoint.z);
-    sphereDetail(4);
-    sphere(1);
-    popMatrix();
+    vertex(surfacePoint.x, surfacePoint.y, surfacePoint.z);
   }
-  
-  rotationX += .1;
+  endShape();
+
+  rotationX += .04;
 }
-
-
 
 ///Get a point on sphere-surface based on height, radius and angle
 ///use to calculate points defining the spiral
@@ -44,15 +45,19 @@ void draw() {
 ///x = r sin PHI cos THETA
 ///y = r sin PHI sin THETA
 ///z = r cos PHI
-PVector pointOnSphere(float _h, float _R, float _angle){
-  
+PVector pointOnSphere(float _h, float _R, float _angle) {
+
   float phi = acos(_h/_R);
   float theta = _angle;
-  
+
   float x = _R*sin(phi)*cos(theta);
   float z = _R*sin(phi)*sin(theta);
   float y = _R*cos(phi);
   PVector surfacePoint = new PVector(x, y, z);
-  
+
   return surfacePoint;
+}
+
+void mouseReleased(){
+  whiteBG = !whiteBG;
 }
